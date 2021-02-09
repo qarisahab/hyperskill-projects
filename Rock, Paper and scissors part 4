@@ -1,0 +1,50 @@
+from random import choice
+import random
+options = ['rock', 'paper', 'scissors']
+
+user_name = input("Enter your name:")
+print('Hello, ' + user_name )
+
+read_file = open('rating.txt', 'r')
+new_file_name = read_file.readlines()
+for names in new_file_name:
+    split_names = names.split(' ')
+    names_in_file = split_names[0]
+    score_in_file = split_names[1]
+    if names_in_file == user_name:
+        nn_name = names_in_file#sets the name to use from the file
+        ss_name = int(score_in_file)
+        break
+else:
+    nn_name = user_name
+    ss_name = 0
+
+ss = True
+while ss:
+    aa = random.choice(options)
+    UserAns = input()
+    if UserAns == "scissors" or UserAns == "rock" or UserAns == "paper" or UserAns == "!exit"or UserAns == "!rating":
+        if UserAns == "!exit":
+            print("Bye!")
+            ss = False
+            break
+        elif UserAns == "!rating":
+            print("Your rating: %d"%(ss_name))
+        elif UserAns == aa:
+            print("There is a draw %s" %(UserAns))
+            ss_name += 50
+        elif (UserAns == "scissors") and (aa == "paper"):
+            print("Well done. The computer chose paper and failed")
+            ss_name += 100
+        elif UserAns == "rock" and aa == "scissors":
+            print("Well done. The computer chose scissors and failed")
+            ss_name += 100
+        elif UserAns == "paper" and aa == "rock":
+            print("Well done. The computer chose rock and failed")
+            ss_name += 100
+        else:
+            print("Sorry, but the computer chose {}".format(aa))
+    else:
+        print("Invalid input")
+        ss = False
+        
