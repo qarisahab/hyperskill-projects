@@ -1,0 +1,58 @@
+import requests
+from bs4 import BeautifulSoup
+import re
+import os
+
+inp = int(input("How many pages do you wanna test this on?\n))
+ssss = "News"
+
+start_dir = os.getcwd()
+print(start_dir)
+for i in range(1, inp+1):
+    os.chdir(start_dir)
+
+    print("https://www.nature.com/nature/articles?searchType=journalSearch&sort=PubDate&page=%d" % i)
+    Pag_name = "Page_%d" % i
+    try:
+        os.mkdir(Pag_name)
+        os.chdir(start_dir + "\\" + Pag_name)
+    except:
+        if os.access(os.getcwd() + "\\" + Pag_name, os.F_OK) is True:
+            for i in os.listdir(os.getcwd() + "\\" + Pag_name):
+                os.remove(os.getcwd() + "\\" + Pag_name + "\\" + i)
+        os.chdir(start_dir + "\\" + Pag_name)
+
+    print(i)
+    r = requests.get("https://www.nature.com/nature/articles?searchType=journalSearch&sort=PubDate&page=%d" % i)
+    soup = BeautifulSoup(r.content, 'html.parser')
+    page_content = requests.get(
+        "https://www.nature.com/nature/articles?searchType=journalSearch&sort=PubDate&page=%d" % i).content
+    cc, ccc = [], []
+    ss = soup.find_all('a')
+    for i in ss:
+        PageFind = (i.get('href', None))
+        findd = re.findall("/articles/.+", PageFind)
+        if len(findd) > 0:
+            cc.append(findd[0])
+    ss = soup.find_all('span', class_="c-meta__type")
+    for i in ss:
+        ccc.append(i.string)
+    sos = "https://www.nature.com"
+    for a, b in zip(cc, ccc):
+        if b == ssss:
+            print(sos + a)
+            new_link = sos + a
+            ror = requests.get(new_link)
+            soup = BeautifulSoup(ror.content, 'html.parser')
+            name = soup.find_all("title")[0].string + ".txt"
+            name = name.replace(" ", "_").replace(":", "")
+            print(name)
+            try:
+                content = soup.find('div', class_='article__body').text.strip()
+                with open(name, 'wb') as file:
+                    file.write(content.encode())
+                file.close()
+            except:
+                continue
+print("content saved.")
+os.chdir(start_dir)
